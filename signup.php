@@ -1,5 +1,5 @@
 <?php
-include "config.php";
+session_start();
 
 $errors = [];
 
@@ -31,34 +31,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        // Check if email already exists
-        $sql = "SELECT id FROM users WHERE email = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $errors[] = "Email already exists.";
-        } else {
-            // Hash the password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-            // Insert user into database
-            $sql = "INSERT INTO users (fullname, email, password) VALUES (?, ?, ?)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sss", $fullname, $email, $hashed_password);
-
-            if ($stmt->execute()) {
-                $_SESSION["user"] = $fullname;
-                $_SESSION["email"] = $email;
-                header("Location: dashboard.php");
-                exit();
-            } else {
-                $errors[] = "Error creating account. Please try again.";
-            }
-        }
-        $stmt->close();
+        $_SESSION["user"] = $fullname;
+        $_SESSION["email"] = $email;
+        header("Location: dashboard.php");
+        exit();
     }
 }
 ?>

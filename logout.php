@@ -1,5 +1,5 @@
 <?php
-include "config.php";
+session_start();
 
 if (isset($_GET["action"]) && $_GET["action"] == "logout") {
     session_unset();

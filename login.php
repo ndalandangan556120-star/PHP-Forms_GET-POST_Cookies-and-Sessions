@@ -1,5 +1,5 @@
 <?php
-include "config.php";
+session_start();
 
 $error = "";
 
@@ -11,32 +11,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($email) || empty($password)) {
         $error = "All fields are required.";
     } else {
-        // Query the database for the user
-        $sql = "SELECT * FROM users WHERE email = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+        $_SESSION["user"] = $email;
 
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            // Verify the password
-            if (password_verify($password, $user["password"])) {
-                $_SESSION["user"] = $user["fullname"];
-                $_SESSION["email"] = $email;
+        // Cookie: Remember email
+        setcookie("remember_user", $email, time() + 86400, "/");
 
-                // Cookie: Remember email
-                setcookie("remember_user", $email, time() + 86400, "/");
-
-                header("Location: dashboard.php");
-                exit();
-            } else {
-                $error = "Invalid email or password.";
-            }
-        } else {
-            $error = "Invalid email or password.";
-        }
-        $stmt->close();
+        header("Location: dashboard.php");
+        exit();
     }
 }
 ?>
